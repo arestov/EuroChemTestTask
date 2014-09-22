@@ -1,4 +1,4 @@
-define(['pv', 'spv', 'jquery', 'js/models/LoadableListBase', 'js/modules/parseCVS', 'js/models/columns'], function(pv, spv, $, LoadableListBase, csv, columnsNS) {
+define(['pv', 'spv', 'jquery', 'js/models/LoadableListBase', 'js/modules/parseCVS', 'js/models/columns-ns'], function(pv, spv, $, LoadableListBase, csv, columnsNS) {
 "use strict";
 var wd  = window;
 var localLang = wd ?
