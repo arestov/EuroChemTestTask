@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html >
+  <head>
+	<meta charset="utf-8">
+	<script data-main="loader" src="js/common-libs/require-2.1.10.min.js"></script>
+	<title>Конфигуратор</title>
+	<style type="text/css">
+	html {
+		font-size:14px;
+	}
+	body {
+		
+		font-family: Arial, Helvetica ,sans-serif;
+		line-height:1.5;
+		color:#333;
+	}
+	body {
+		background: #ddd;
+		margin: 0;
+	}
+	label {
+		cursor: pointer;
+		display: inline-block;
+		margin: 0 1rem;
+		display: block;
+	}
+	label:hover {
+		color:#000;
+		
+	}
+	label:hover .label_text{
+		border-bottom: 1px solid #ccc;
+	}
+	.text_warning {
+		color:red;
+	}
+	.hidden {
+		display: none !important;
+	}
+	.column-left-of-three {
+		float: left;
+		
+		width: 16rem;
+	}
+	.column-middle-of-three {
+		overflow: hidden;
+	}
+
+	.column-right-of-three {
+		float: right;
+		width: 16rem;
+	}
+	.options_list {
+		min-height: 40rem;
+		padding: 0.5rem;
+		border-radius: 0.5rem;
+		margin: 0.5rem;
+		background: #eee;
+		border-bottom: 1px solid #ddd;
+	}
+	.avcolumn-base {
+		padding: 0.1rem 0.3rem;
+		cursor: default;
+		position: relative;
+	}
+		.avcolumn-base:nth-of-type(even) {
+			background: #f3f3f3;
+		}
+
+		.avcolumn-base.avcolumn-base-selected {
+			background: #E1F1E3;
+		}
+		.avcolumn-base:hover {
+			background: #ddd;
+		}
+		.avcolumn-selmark {
+			display: inline-block;
+			width: 1rem;
+		}
+
+		.avcolumn-base-mathmark:after,
+		.avcolumn-base-charmark:after,
+		.avcolumn-base-linkmark:after,
+		.avcolumn-base-clockmark:after {
+			display: block;
+			position: absolute;
+			content: ' ';
+			top: 4px;
+			right: 6px;
+			height: 16px;
+			width: 16px;
+			opacity: 0.1;
+			background: transparent no-repeat 50% 50%;
+			background-size:contain;
+		}
+
+		.avcolumn-base-mathmark:after{
+			background-image: url(./img/icon-math.svg);
+		}
+		.avcolumn-base-charmark:after{
+			background-image: url(./img/icon-char.svg);
+		}
+		.avcolumn-base-linkmark:after{
+			background-image: url(./img/icon-link.svg);
+		}
+		.avcolumn-base-clockmark:after{
+			background-image: url(./img/icon-clock.svg);
+		}
+	.actcolumn-base {
+
+	}
+		.actcolumn-base-selected {
+			background: #E1F1E3;
+		}
+	.configr-page {
+		width: 57rem;
+		margin: 0 auto;
+		padding: 2rem 2rem;
+		background: #fff;
+		overflow: hidden;
+	}
+
+	.pseudo_link {
+		border-bottom: 1px dashed #aaa;
+		cursor: pointer;
+		display: inline-block;
+		padding-bottom: 0px;
+	}
+		.pseudo_link:hover {
+			color: #666;
+		}
+		.pseudo_link:active {
+			color:#000;
+		}
+	.header_list_item {
+		display: inline-block;
+		border: 1px dotted #aaa;
+		font-weight: 400;
+		font-size: 1rem;
+		border-radius: 0.3rem;
+		padding: 0 0.3rem;
+	}
+	.header_list_item-remover {
+		cursor: pointer;
+	}
+	.column_contr_b-base {
+		overflow: hidden;
+		min-height: 3rem;
+	}
+
+		.column_contr_b-item {
+			cursor: pointer;
+			font-size: 1.2rem;
+			background: #fff;
+			padding: 0.5rem;
+			border-radius: 0.5rem;
+		}
+		.column_contr_b-item-fade {
+			background: transparent;
+			color:#999;
+		}
+		.column_contr_b-item:hover {
+			background: #aaa;
+			color:#fff;
+		}
+		.column_contr_b-item:active {
+			background: #666;
+		}
+			.column_contr_b-item-left {
+				float:left;
+			}
+			.column_contr_b-item-right {
+				float: right;
+			}
+		.scrollbox {
+			overflow-y: auto;
+			height: 600px;
+		}
+	</style>
+  </head>
+  
+<body>
+	<div id="app-root">
+		<div class="configr-page">
+			<div pv-text="{{title}}"></div>
+
+			<div class="column-left-of-three">
+				<h3>
+					Available columns
+					<a class="pseudo_link" pv-events="click::switchColumsSorting" pv-text="{{columnsSortingDesc}}"></a>
+				</h3>
+				<div>
+					<input type="search" pv-events="input::setUserColumnsQuery:%value%">
+				</div>
+				<div class="scrollbox">
+					
+					<div class="">
+						<div 
+							pv-nest="sorted_colums"
+							pv-events="dblclick::addToActivatedList click:selectToConfigurate" 
+							class="avcolumn-base hidden" 
+							pv-class="
+								avcolumn-base
+								{{not_inited && 'hidden'}} 
+								{{selected_to_conf && 'avcolumn-base-selected'}}
+
+								{{type == 'number' && 'avcolumn-base-mathmark'}}
+								{{type == 'text' && 'avcolumn-base-charmark'}}
+								{{type == 'url' && 'avcolumn-base-linkmark'}}
+								{{type == 'date' && 'avcolumn-base-clockmark'}}
+								{{type == 'datetime' && 'avcolumn-base-clockmark'}}
+
+							">
+							<span class="avcolumn-selmark" pv-text="{{columnIsActive && '✔'}}"></span>
+							<span pv-text="{{local_name}}"></span>
+						</div>
+					</div>
+				</div>
+				
+			</div>
+			<div class="column-right-of-three">
+				<h3>Columns used in view</h3>
+				<div class="scrollbox">
+					<div 
+						pv-nest="active_columns_sorted"
+						pv-events="click:selectToConfigurate"
+						class="actcolumn-base"
+						pv-class="actcolumn-base
+							{{selected_to_conf && 'actcolumn-base-selected'}}
+							"
+						>
+						<span pv-text="{{local_name}}"></span>
+					</div>
+
+				</div>
+				
+			</div>
+			<div class="column-middle-of-three">
+				<div class="options_list">
+
+					<div class="hidden" pv-class="{{!selected_columns_length && 'hidden'}}">
+						<h3>Options for 
+							<span pv-nest="selected_columns:simple" >
+
+								
+								<span class="header_list_item" >
+									<span pv-text='{{local_name}}'></span>
+									<span pv-events="click::deselectToConfigurate" class="header_list_item-remover">&times;</span>
+								</span>
+								
+								<span pv-text='{{!$last && " "}}'>
+
+							</span></span></h3>
+						<div>
+							<div pv-nest="selected_column" class="hidden" pv-class="{{not_inited && 'hidden'}}">
+								<div class="column_contr_b-base">
+									<a 
+										class="column_contr_b-item column_contr_b-item-left"
+										pv-class="column_contr_b-item column_contr_b-item-left {{!can_remove_from_active && 'column_contr_b-item-fade'}}"
+										pv-events="click::removeFromActive">&larr;</a>
+									<a
+										class="column_contr_b-item column_contr_b-item-right"
+										pv-class="column_contr_b-item column_contr_b-item-right {{!can_add_to_active && 'column_contr_b-item-fade'}}"
+										pv-events="click::addToActive">&rarr;</a>
+									
+
+
+
+
+								</div>
+								
+								<form>
+									<div class="hidden" pv-class="{{!availableInputsIndex.sorting}}">
+										<h3>Sorting</h3>
+										<label>
+											<input type='radio' name="sorting" value="0"  pv-events="click:selectRadioState" pv-props="checked:{{!sorting}}"/>
+											not important
+
+										</label>
+										<label>
+											<input type='radio' name="sorting" value="asc"  pv-events="click:selectRadioState" pv-props="checked:{{sorting == 'asc'}}"/>
+											ascending (A-Z)
+
+										</label>
+										<label>
+											<input type='radio' name="sorting" value="des"  pv-events="click:selectRadioState" pv-props="checked:{{sorting == 'des'}}"/>
+											descending (Z-A)
+										</label>
+									</div>
+									<!--
+										!sorting
+										!num_calculation
+										!num_filter**
+										unknown_format
+										!simple_grouping
+										unknown_text_compare
+										unknown_filter
+										!date_grouping
+										!date_compare
+										unknown_calculation
+									-->
+									
+									<div class="hidden" pv-class="{{!availableInputsIndex.simple_grouping && 'hidden'}}">
+										<h3>Grouping</h3>
+										<label>
+											<input type='radio' name="simple_grouping" value="0"  pv-events="click:selectRadioState" pv-props="checked:{{!simple_grouping}}"/>
+											don't group
+										</label>
+										<label>
+											<input type='radio' name="simple_grouping" value="values"  pv-events="click:selectRadioState" pv-props="checked:{{simple_grouping == 'values'}}"/>
+											by exact values
+										</label>
+										<label>
+											<input type="checkbox" name="simple_grouping_show_rows" pv-events="click:selectRadioState" value="1" pv-props="checked:{{simple_grouping_show_rows == 1}}"/>
+											show rows count
+										</label>
+									</div>
+									<div class="hidden" pv-class="{{!availableInputsIndex.date_grouping && 'hidden'}} ">
+										<h3>Grouping</h3>
+										<label>
+											<input type='radio' name="date_grouping" value="0"  pv-events="click:selectRadioState" pv-props="checked:{{!date_grouping}}"/>
+											don't group
+										</label>
+										<label>
+											<input type='radio' name="date_grouping" value="values"  pv-events="click:selectRadioState" pv-props="checked:{{date_grouping == 'values'}}"/>
+											by exact values
+										</label>
+										<label>
+											<input type='radio' name="date_grouping" value="years"  pv-events="click:selectRadioState" pv-props="checked:{{date_grouping == 'years'}}"/>
+											by years
+										</label>
+										<label>
+											<input type='radio' name="date_grouping" value="quarters"  pv-events="click:selectRadioState" pv-props="checked:{{date_grouping == 'quarters'}}"/>
+											by quarters
+										</label>
+										<label>
+											<input type='radio' name="date_grouping" value="months"  pv-events="click:selectRadioState" pv-props="checked:{{date_grouping == 'months'}}"/>
+											by months
+										</label>
+
+									</div>
+									
+									<div class="hidden" pv-class="{{!availableInputsIndex.num_calculation && 'hidden'}} ">
+										<h3>Calculation</h3>
+										<label>
+											<input type='radio' name="num_calculation" value="0"  pv-events="click:selectRadioState" pv-props="checked:{{!num_calculation}}"/>
+											no calculation
+										</label>
+										<label>
+											<input type='radio' name="num_calculation" value="max"  pv-events="click:selectRadioState" pv-props="checked:{{num_calculation == 'max'}}"/>
+											find maximum
+										</label>
+										<label>
+											<input type='radio' name="num_calculation" value="min"  pv-events="click:selectRadioState" pv-props="checked:{{num_calculation == 'min'}}"/>
+											find minimum
+										</label>
+										<label>
+											<input type='radio' name="num_calculation" value="sum"  pv-events="click:selectRadioState" pv-props="checked:{{num_calculation == 'sum'}}"/>
+											compute sum
+										</label>
+										<label>
+											<input type='radio' name="num_calculation" value="perc_sum"  pv-events="click:selectRadioState" pv-props="checked:{{num_calculation == 'perc_sum'}}"/>
+											sum as percentage
+										</label>
+										<label>
+											<input type='radio' name="num_calculation" value="ave"  pv-events="click:selectRadioState" pv-props="checked:{{num_calculation == 'ave'}}"/>
+											find average
+										</label>
+									</div>
+
+									
+									<div class="hidden" pv-class="{{!availableInputsIndex.num_filter && 'hidden'}} ">
+										<h3>Filter</h3>
+										<label>
+											<input type="text" name="filter_condition"/>
+											<br/>
+											Examples: > 10 000, 500, &lt;= 15 000
+										</label>
+										
+										<label>
+											<input type='radio' name="filter_order" value="before"  pv-events="click:selectRadioState" pv-props="checked:{{filter_order == 'before'}}"/>
+											apply before calculation
+
+										</label>
+										<label>
+											<input type='radio' name="filter_order" value="after"  pv-events="click:selectRadioState" pv-props="checked:{{filter_order == 'after'}}"/>
+											apply after calculation
+
+										</label>
+										<label>
+											<input type="checkbox" value="1" name="hide_column" pv-events="click:selectRadioState" pv-props="checked:{{hide_column == 1}}"/>
+											hide column
+										</label>
+									</div>
+
+									
+									
+									<div class="hidden" pv-class="{{!availableInputsIndex.date_compare && 'hidden'}}">
+										<h3>Compare</h3>
+										<label>
+											<input type='radio' name="date_compare" value="0"  pv-events="click:selectRadioState" pv-props="checked:{{!date_compare}}"/>
+											don't compare
+
+										</label>
+										<div>
+											<label>
+												<input type='radio' name="date_compare" value="calc"  pv-events="click:selectRadioState" pv-props="checked:{{date_compare == 'calc'}}"/>
+												by calculations
+
+											</label>
+											<div class="text_warning hidden" pv-class="text_warning {{(date_compare || !comparingColumnsByCalcNum) && 'hidden'}}">
+												You already have <strong><span pv-text="{{comparingColumnsByCalcNum}}"></span></strong> <em>comparing by calculation</em> column.
+												Changing this input will reset it. (на самом деле нет)
+											</div>
+										</div>
+										<label>
+											<input type='radio' name="date_compare" value="months"  pv-events="click:selectRadioState" pv-props="checked:{{date_compare == 'months'}}"/>
+											by months
+
+										</label>
+										<label>
+											<input type='radio' name="date_compare" value="quarters"  pv-events="click:selectRadioState" pv-props="checked:{{date_compare == 'quarters'}}"/>
+											by quarters
+
+										</label>
+										<label>
+											<input type='radio' name="date_compare" value="years"  pv-events="click:selectRadioState" pv-props="checked:{{date_compare == 'years'}}"/>
+											by years
+
+										</label>
+
+
+
+									</div>	
+									
+									<h4>Format</h4>
+
+								</form>
+							</div>
+						</div>
+						<!--
+						<div  class="hidden" pv-class="{{(!selected_columns_length || selected_columns_length <= 1) && 'hidden'}}"></div>
+						
+						<div pv-nest="selected_column for_model:NumberColumnOptions">
+							<span pv-text="{{local_name}}"></span>
+							
+							
+
+						</div>
+						<div pv-nest="selected_column for_model:DateColumnOptions">
+							<span pv-text="{{local_name}}"></span>
+							
+							
+						</div>
+						-->
+					</div>
+				</div>
+			</div>
+
+			
+		</div>
+		
+		
+	</div>
+</body>
+</html>
