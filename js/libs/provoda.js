@@ -678,7 +678,7 @@ var setEvLiItems = function(items_list) {
 		var oldv = cur.current_motivator;
 		cur.current_motivator = this.current_motivator;
 
-		this.controls_list[i] = cur.evcompanion._addEventHandler(this.event_name, this.event_callback, this, false, false, this.skip_reg, false, false, true);
+		this.controls_list[i] = cur.evcompanion._addEventHandler(this.event_name, this.event_callback, this, false, false, true, false, false, true);
 		//_addEventHandler: function(namespace, cb, context, immediately, exlusive, skip_reg, soft_reg, once, easy_bind_control){
 
 		/*this.controls_list[i] = cur.on(this.event_name, this.event_callback, {
@@ -700,7 +700,7 @@ var ItemsEvents = function(event_name, md, callback) {
 	this.controls_list = [];
 	this.event_name = event_name;
 	this.callback = callback;
-	this.skip_reg = false;
+	//this.skip_reg = true;
 	this.current_motivator = null;
 };
 ItemsEvents.prototype = {
@@ -709,8 +709,8 @@ ItemsEvents.prototype = {
 		this.md.current_motivator = this.current_motivator;
 		this.callback.call(this.md, {
 			target: this.md,
-			item: e.target,
-			value: e.value,
+			item: e && e.target,
+			value: e && e.value,
 			items: this.items_list
 		});
 		this.md.current_motivator = old_value;
@@ -722,7 +722,11 @@ ItemsEvents.prototype = {
 			}
 		}
 	},
-	setItems: setEvLiItems
+	setItemsReal: setEvLiItems,
+	setItems: function(items_list) {
+		this.setItemsReal( items_list && spv.toRealArray( items_list ) );
+		this.event_callback();
+	}
 };
 
 
@@ -736,7 +740,7 @@ var StatesArchiver = function(state_name, result_state_name, md, calculateResult
 
 	this.state_name = state_name;
 	this.event_name = 'lgh_sch-' + this.state_name;
-	this.skip_reg = true;
+	//this.skip_reg = true;
 
 	var calcR = calculateResult;
 	if (calcR){
@@ -789,8 +793,7 @@ StatesArchiver.prototype = {
 	},
 	setItemsReal: setEvLiItems,
 	setItems: function(items_list) {
-		items_list = items_list && spv.toRealArray(items_list);
-		this.setItemsReal(items_list);
+		this.setItemsReal( items_list && spv.toRealArray( items_list ) );
 		this.event_callback();
 	}
 };

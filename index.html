@@ -173,8 +173,21 @@
 				float: right;
 			}
 		.scrollbox {
+			padding: 3px;
 			overflow-y: auto;
 			height: 600px;
+		}
+		.surf_nav.surf_nav_twice {
+			background: orange;
+		}
+		.actcolumn-base {
+			position: relative;
+			padding: 0.1rem 0.3rem;
+		}
+		.is_last_waypoint {
+			z-index: 2;
+			box-shadow: 0px 0px 1px 1px rgb(121, 121, 121);
+			border-radius: 1px;
 		}
 	</style>
   </head>
@@ -197,7 +210,7 @@
 					<div class="">
 						<div 
 							pv-nest="sorted_colums"
-							pv-events="dblclick::addToActivatedList click:selectToConfigurate" 
+							pv-events="dblclick::addToActivatedList click:selectToConfigurate wpchActive:wpchActive wpchLast:wpchLast waypointPress:waypointPress" 
 							class="avcolumn-base hidden" 
 							pv-class="
 								avcolumn-base
@@ -209,8 +222,11 @@
 								{{type == 'url' && 'avcolumn-base-linkmark'}}
 								{{type == 'date' && 'avcolumn-base-clockmark'}}
 								{{type == 'datetime' && 'avcolumn-base-clockmark'}}
-
-							">
+								{{is_waypoint && 'surf_nav surf_nav_twice'}}
+								{{is_last_waypoint && 'is_last_waypoint'}}
+							"
+							pv-type="way-point"
+							>
 							<span class="avcolumn-selmark" pv-text="{{columnIsActive && '✔'}}"></span>
 							<span pv-text="{{local_name}}"></span>
 						</div>
@@ -223,11 +239,14 @@
 				<div class="scrollbox">
 					<div 
 						pv-nest="active_columns_sorted"
-						pv-events="click:selectToConfigurate"
+						pv-events="click:selectToConfigurate wpchActive:wpchActive wpchLast:wpchLast waypointPress:waypointPress"
 						class="actcolumn-base"
 						pv-class="actcolumn-base
 							{{selected_to_conf && 'actcolumn-base-selected'}}
+							{{is_waypoint && 'surf_nav surf_nav_twice'}}
+							{{is_last_waypoint && 'is_last_waypoint'}}
 							"
+						pv-type="way-point"
 						>
 						<span pv-text="{{local_name}}"></span>
 					</div>
@@ -392,6 +411,18 @@
 											hide column
 										</label>
 									</div>
+									<div class="hidden" pv-class="{{!availableInputsIndex.text_filter && 'hidden'}} ">
+										<h3>Filter</h3>
+										<label>
+											<input type="text" name="filter_value" pv-events="input:selectRadioState" pv-props="value:{{filter_value}}"/>
+											<div class="">
+
+											</div>
+										</label>
+									</div>
+
+
+
 
 									
 									

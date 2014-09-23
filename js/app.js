@@ -143,10 +143,14 @@ LoadableListBase.extendTo(AppModel, {
 			title: 'Конфигуратор',
 			columnsSorting: columnsSortings[0]
 		});
+		this._saved_selected_columns = null;
+		this._saved_active_columns = null;
 		this.multiColumn = this.initSi(columnsNS.MultiColumnsOptions);
 		
 		this.on('child_change-selected_columns', function(e) {
-			remarkState(e.value, e.old_value, 'selected_to_conf');
+			var old_value = this._saved_selected_columns;
+			this._saved_selected_columns = e.value;
+			remarkState(e.value, old_value, 'selected_to_conf');
 		});
 
 		this.on('child_change-selected_columns', function(e) {
@@ -156,7 +160,7 @@ LoadableListBase.extendTo(AppModel, {
 				if (e.value.length > 1) {
 					var inputs = getMulticolumnInputs(e.value);
 
-					this.multiColumn.updateNesting('columns', e.value);
+					this.multiColumn.updateNesting('columns', e.value.slice());
 					this.multiColumn.updateManyStates({
 						availableInputs: inputs.array,
 						availableInputsIndex: inputs.index
@@ -169,7 +173,9 @@ LoadableListBase.extendTo(AppModel, {
 			}
 		});
 		this.on('child_change-active_columns', function(e) {
-			remarkState(e.value, e.old_value, 'columnIsActive');
+			var old_value = this._saved_active_columns;
+			this._saved_active_columns = e.value;
+			remarkState(e.value, old_value, 'columnIsActive');
 		});
 		bindNestingFlows(this, 'active_columns', 'has_comparing', null, 'comparingColumns');
 
